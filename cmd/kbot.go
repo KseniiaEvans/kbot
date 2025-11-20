@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -16,6 +18,29 @@ import (
 var (
 	TeleToken = os.Getenv("TELE_TOKEN")
 )
+
+const (
+	stateNone       = ""
+	stateBackQAsked = "back_question_asked"
+)
+
+var (
+	// зберігаємо стани по chat ID
+	chatStates = make(map[int64]string)
+	stateMu    sync.Mutex
+)
+
+func setState(chatID int64, state string) {
+	stateMu.Lock()
+	defer stateMu.Unlock()
+	chatStates[chatID] = state
+}
+
+func getState(chatID int64) string {
+	stateMu.Lock()
+	defer stateMu.Unlock()
+	return chatStates[chatID]
+}
 
 // kbotCmd represents the kbot command
 var kbotCmd = &cobra.Command{
@@ -41,16 +66,42 @@ to quickly create a Cobra application.`,
 			return
 		}
 
-		kbot.Handle(telebot.OnText, func(m telebot.Context) error {
-			log.Printf("Received message: %s", m.Text())
-			payload := m.Message().Payload
-			switch payload {
-			case "hello":
-				return m.Send(fmt.Sprintf("Hello, I'm Kbot %s! How can I assist you today?", appVersion))
+		kbot.Handle(telebot.OnText, func(c telebot.Context) error {
+			text := strings.TrimSpace(c.Text())
+			lower := strings.ToLower(text)
+			chatID := c.Chat().ID
+
+			log.Printf("Received message from chat %d: %s", chatID, text)
+
+			currentState := getState(chatID)
+
+			// 1. Старт діалогу
+			if currentState == stateNone &&
+				(lower == "hello" || lower == "/start") {
+
+				setState(chatID, stateBackQAsked)
+				return c.Send("Hello, Elizabeth! Have you zrobyla vpravy na spynu? Yes/No")
 			}
 
-			return err
+			// 2. Ми вже задали питання й чекаємо Yes/No
+			if currentState == stateBackQAsked {
+				if lower == "yes" || lower == "y" {
+					setState(chatID, stateNone)
+					return c.Send("Great! +1 day of back exercises! 🔥 Kseniia is happy 🥰")
+				}
+				if lower == "no" || lower == "n" {
+					setState(chatID, stateNone)
+					return c.Send("Kseniia is sad. Come back tomorrow, Elizabeth. We will talk again.")
+				}
+
+				// некоректна відповідь – просимо конкретно Yes/No, не змінюючи стан
+				return c.Send("Please answer only Yes or No 🙂")
+			}
+
+			// 3. Будь-який інший текст поза діалогом
+			return c.Send("Type 'hello' or '/start' to begin our little back-exercise ritual 😉")
 		})
+
 		kbot.Start()
 	},
 }
