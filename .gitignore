@@ -32,3 +32,6 @@ go.work.sum
 # .vscode/
 
 .vscode/
+
+google-cloud-sdk/
+**/google-cloud-sdk

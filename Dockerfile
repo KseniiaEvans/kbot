@@ -15,13 +15,7 @@ RUN echo "OS: $TARGETOS, ARCH: $TARGETARCH" > /log
 WORKDIR /go/src/app
 COPY . .
 RUN export GOPATH=/go
-RUN go get -d -v .
-RUN gofmt -s -w ./
-
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-    go build -v -o kbot \ 
-    -ldflags "-X="github.com/den-vasyliev/kbot/cmd.appVersion=${VERSION}-$(echo -n ${APP_BUILD_INFO}|cut -c1-7)-${TARGETARCH}
-
+RUN make build TARGETOS=${TARGETOS} TARGETARCH=${TARGETARCH}
 
 FROM scratch AS bin
 WORKDIR /
