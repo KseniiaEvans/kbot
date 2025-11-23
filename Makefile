@@ -26,20 +26,27 @@ image:
 	docker build . \
 		-t $(APP):$(VERSION)-$(TARGETOS)-$(ARCH) \
 		--no-cache \
-		--platform $(TARGETOS)/$(ARCH)
+		--platform $(TARGETOS)/$(ARCH) \
+		--build-arg APP=${APP} \
+		--build-arg VERSION=${VERSION} \
+
+run:
+	docker run \
+		--rm --env-file .env \
+		$(APP):$(VERSION)-$(TARGETOS)-$(ARCH)
 
 push:
 	docker push ${REGISTRY}/${APP}:${VERSION}-${ARCH}
 
 linux: TARGETOS=linux
-linux: build image
+linux: image
 
 
 windows: TARGETOS=windows
-windows: build image
+windows: image
 
 macos: TARGETOS=darwin
-macos: build image
+macos: image
 
 
 clean:
