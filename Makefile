@@ -45,8 +45,10 @@ linux: image
 windows: TARGETOS=windows
 windows: image
 
-macos: TARGETOS=darwin
-macos: image
+# Docker containers run only on linux/windows
+# Hence either use Docker Desktop with linux/windows container 
+# OR build go binary file for MacOS
+macos: build
 
 arm: TARGETARCH=arm64
 arm: image
