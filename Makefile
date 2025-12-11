@@ -25,14 +25,9 @@ build: format get
 
 image:
 	docker build . \
-		-t $(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) \
+		-t ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) \
 		--no-cache \
-		--platform $(TARGETOS)/$(TARGETARCH) \
-
-image:
-	docker build . -t ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) \
-		--build-arg TARGETARCH=$(TARGETARCH) \
-		--build-arg VERSION=$(VERSION)
+		--platform $(TARGETOS)/$(TARGETARCH)
 
 run:
 	docker run \
@@ -56,7 +51,10 @@ macos: build
 arm: TARGETARCH=arm64
 arm: image
 
+
 clean:
 	rm -rf ${APP}
 	rm -f ${APP}-*.tgz
-	docker rmi ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
+	@docker image inspect ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) >/dev/null 2>&1 && \
+		docker rmi ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) || \
+		echo "Image not found locally, skipping removal"
