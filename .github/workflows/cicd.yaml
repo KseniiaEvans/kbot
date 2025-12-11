@@ -57,10 +57,6 @@ jobs:
         with:
           fetch-depth: 0
 
-
-      - name: Deploy to Production
-        run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
       - name: Set version in Helm chart
         uses: mikefarah/yq@master
         with:
@@ -75,4 +71,8 @@ jobs:
           git push
 
       - name: Cleanup
-        run: make clean TARGETOS=${{ env.TARGETOS }} TARGETARCH=${{ env.TARGETARCH }}
+        run: |
+          make clean \
+          TARGETARCH=${{ env.TARGETARCH }} \
+          TARGETOS=${{ env.TARGETOS }} \
+          VERSION=${{ env.VERSION }}
