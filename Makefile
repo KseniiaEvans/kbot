@@ -53,6 +53,6 @@ arm: TARGETARCH=arm64
 arm: image
 
 clean:
-	rm -rf kbot
+	rm -rf ${APP}
 	rm -f ${APP}-*.tgz
 	docker rmi $(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)

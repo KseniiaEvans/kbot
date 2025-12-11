@@ -57,6 +57,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set VERSION
+        run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Set version in Helm chart
         uses: mikefarah/yq@master
         with:
