@@ -11,7 +11,7 @@ env:
   TARGETOS: linux
   CGO_ENABLED: 0
   VALUES_FILEPATH: helm/values.yaml
-  REGISTRY: ghcr.io/${{ github.repository_owner }}
+  REGISTRY: ghcr.io/kseniiaevans
 
 
 jobs:
