@@ -33,10 +33,6 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
-        env:
-          APP: kbot
-          REGISTRY: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
           make image push \
           TARGETARCH=${{ env.TARGETARCH }} \
@@ -59,8 +55,6 @@ jobs:
 
 
       - name: Deploy to Production
-        with: 
-          fetch-depth: 0
         run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Set version in Helm chart
@@ -71,9 +65,9 @@ jobs:
       - name: Commit Helm chart changes
         run: |
           git config user.name github-actions
-          git config user.email github-actions.github.com
+          git config user.email github-actions@github.com
           git add helm/values.yaml
-          git commit -am: "update version to $VERSION"
+          git commit -m "update version to $VERSION"
           git push
 
       - name: Cleanup
