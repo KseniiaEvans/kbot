@@ -11,7 +11,6 @@ env:
   TARGETOS: linux
   CGO_ENABLED: 0
   VALUES_FILEPATH: helm/values.yaml
-  GITHUB_TOKEN: 
 
 
 jobs:
@@ -74,8 +73,6 @@ jobs:
           git add ${{ env.VALUES_FILEPATH }}
           git commit -m "update version to $VERSION"
           git push
-        env:
-            GITHUB_TOKEN: ${{ secrets.KBOT_CICD }}
 
       - name: Cleanup
         run: make clean TARGETOS=${{ env.TARGETOS }} TARGETARCH=${{ env.TARGETARCH }}
