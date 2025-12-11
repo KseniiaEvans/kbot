@@ -29,13 +29,17 @@ image:
 		--no-cache \
 		--platform $(TARGETOS)/$(TARGETARCH) \
 
+image:
+	docker build . -t ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) \
+		--build-arg TARGETARCH=$(TARGETARCH) \
+		--build-arg VERSION=$(VERSION)
+
 run:
 	docker run \
 		--rm --env-file .env \
 		$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
 
 push:
-	docker tag $(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
 	docker push ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
 
 linux: TARGETOS=linux
@@ -55,4 +59,4 @@ arm: image
 clean:
 	rm -rf ${APP}
 	rm -f ${APP}-*.tgz
-	docker rmi $(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
+	docker rmi ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
