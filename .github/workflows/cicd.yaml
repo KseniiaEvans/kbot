@@ -10,6 +10,8 @@ jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
+    with:
+      fetch-depth: 0
 
     steps:
       - name: checkout
@@ -23,3 +25,35 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        env:
+          APP: kbot
+          REGISTRY: ${{ secrets.DOCKER_HUB_USERNAME }}
+        run: make image push TARGETOS=linux TARGETARCH=amd64 REGISTRY=${{ secrets.DOCKER_HUB_USERNAME }}
+
+
+  cd:
+    name: CD
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy to Production
+        with: 
+          fetch-depth: 0
+        run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - uses: mikefarah/yq@master
+        with:
+          cmd: yq -i '.image.tag = strenv(VERSION)' helm/value.yaml
+
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions.github.com
+          git commit -am: "update version to $VERSION"
+          git push

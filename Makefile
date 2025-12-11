@@ -1,9 +1,9 @@
 APP := $(shell basename $(shell git remote get-url origin))
 
-GCPREPOSITORY := europe-central2-docker.pkg.dev/devops-intensive/core-services
 GITREPOSITORY := KseniiaEvans
-VERSION=$(shell git rev-parse --short HEAD)
+VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 
+REGISTRY ?= europe-central2-docker.pkg.dev/devops-intensive/core-services
 TARGETOS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 TARGETARCH ?= $(shell dpkg --print-architecture)
 
@@ -35,9 +35,8 @@ run:
 		$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
 
 push:
-	docker tag $(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) ${GCPREPOSITORY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
-	docker push ${GCPREPOSITORY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
-
+	docker tag $(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH) ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
+	docker push ${REGISTRY}/$(APP):$(VERSION)-$(TARGETOS)-$(TARGETARCH)
 
 linux: TARGETOS=linux
 linux: image
