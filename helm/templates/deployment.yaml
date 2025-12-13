@@ -30,15 +30,21 @@ spec:
       {{- end }}
       imagePullSecrets:
         - name: gcp-registry-secret
+
       containers:
         - name: {{ .Release.Name }}
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}-{{ .Values.image.arch | default "amd64" }}
+          pullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}-{{ .Values.image.os }}-{{ .Values.image.arch }}
           env:
-            - name: TELE_TOKEN
+            - name: {{ .Values.env.teleToken }}
               valueFrom:
                 secretKeyRef:
                   name: telegram-token-secret
                   key: teleToken
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
