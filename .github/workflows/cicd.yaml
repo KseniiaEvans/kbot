@@ -83,13 +83,6 @@ jobs:
           git push
           echo "✅ Helm chart updated with version ${{ env.VERSION }}"
 
-  cleanup:
-    name: Cleanup
-    needs: cd
-    runs-on: ubuntu-latest
-    if: always()
-    
-    steps:
       - name: Cleanup Docker
         run: |
           echo "🧹 Cleaning up..."
