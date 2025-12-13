@@ -3,7 +3,7 @@ APP := $(shell basename $(shell git remote get-url origin))
 GITREPOSITORY := KseniiaEvans
 VERSION := $(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 
-REGISTRY ?= europe-central2-docker.pkg.dev/devops-intensive/core-services
+REGISTRY ?= kseniiaevans
 TARGETOS ?= $(shell uname -s | tr '[:upper:]' '[:lower:]')
 TARGETARCH ?= $(shell dpkg --print-architecture)
 
