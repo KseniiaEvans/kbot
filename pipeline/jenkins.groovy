@@ -24,11 +24,16 @@ pipeline {
         )
     }
 
+    environment {
+        TARGETOS = "${params.OS}"
+        TARGETARCH = "${params.ARCH}"
+    }
+
     stages {
-        stage('Prepare') {
+
+        stage('Checkout') {
             steps {
-                echo "OS: ${params.OS}"
-                echo "ARCH: ${params.ARCH}"
+                checkout scm
             }
         }
 
@@ -37,22 +42,31 @@ pipeline {
                 expression { !params.SKIP_LINT }
             }
             steps {
-                echo "Running linter..."
+                sh 'make lint'
             }
         }
 
-        stage('Tests') {
+        stage('Test') {
             when {
                 expression { !params.SKIP_TESTS }
             }
             steps {
-                echo "Running tests..."
+                sh 'make test'
             }
         }
 
-        stage('Build') {
+        stage('Build binary') {
             steps {
-                echo "Building for ${params.OS}/${params.ARCH}"
+                sh 'make build'
+            }
+        }
+
+        stage('Build Docker image') {
+            when {
+                expression { params.OS != 'darwin' }
+            }
+            steps {
+                sh 'make image'
             }
         }
     }
