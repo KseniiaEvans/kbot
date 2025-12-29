@@ -123,7 +123,7 @@ kubectl create secret generic telegram-token-secret \
   --from-literal=teleToken=YOUR_TELEGRAM_BOT_TOKEN
 
 # GitHub Container Registry (for private repositories)
-kubectl create secret docker-registry gcp-registry-secret \
+kubectl create secret docker-registry registry-secret \
   --docker-server=ghcr.io \
   --docker-username=YOUR_GITHUB_USERNAME \
   --docker-password=YOUR_GITHUB_TOKEN \
