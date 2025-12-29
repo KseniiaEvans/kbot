@@ -28,8 +28,11 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        - name: gcp-registry-secret
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
 
       containers:
         - name: {{ .Release.Name }}
