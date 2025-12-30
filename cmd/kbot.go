@@ -80,7 +80,7 @@ to quickly create a Cobra application.`,
 				(lower == "hello" || lower == "/start") {
 
 				setState(chatID, stateBackQAsked)
-				return c.Send("Hello, Elizabeth! Have you zrobyla vpravy na spynu? Yes/No")
+				return c.Send("Hello, Elizabeth! Have you zrobyla vpravy na spynu? Please answer only Yes/No")
 			}
 
 			// 2. Ми вже задали питання й чекаємо Yes/No
